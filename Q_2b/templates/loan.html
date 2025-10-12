@@ -1,75 +1,89 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h3 class="text-white text-center py-2" style="background-color:#1b7a43;">CURRENT LOANS</h3>
+<h3 class="text-white text-center py-3" style="background-color:#1b7a43; font-weight:600; letter-spacing:1px;">
+  CURRENT LOANS
+</h3>
 
 <div class="container mt-4 mb-5">
 
   {% if loans and loans|length > 0 %}
-    {% for loan in loans %}
-      {% set borrow_date = loan['borrowDate'] %}
-      {% set due_date = borrow_date + timedelta(days=14) %}
-      {% set return_date = loan['returnDate'] %}
-      {% set overdue = (not return_date) and (due_date < now) %}
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead class="table-light border-bottom">
+          <tr class="text-center">
+            <th style="width:40%;">Title/Author</th>
+            <th style="width:15%;">Due Date</th>
+            <th style="width:15%;">Return Date</th>
+            <th style="width:10%;">Renew Count</th>
+            <th style="width:20%;">Action</th>
+          </tr>
+        </thead>
 
-      <div class="card mb-3 shadow-sm">
-        <div class="row g-0 align-items-center p-2">
+        <tbody>
+          {% for loan in loans %}
+            {% set borrow_date = loan['borrowDate'] %}
+            {% set due_date = borrow_date + timedelta(days=14) %}
+            {% set return_date = loan['returnDate'] %}
+            {% set overdue = (not return_date) and (due_date < now) %}
 
-          <!-- LEFT: COVER IMAGE -->
-          <div class="col-md-2 d-flex justify-content-center">
-            <img src="{{ loan.cover or url_for('static', filename='default_cover.png') }}"
-                alt="cover" width="100" height="140"
-                style="object-fit:cover; border-radius:8px;">
-          </div>
+            <tr class="align-middle">
+              <!-- Title & Author -->
+              <td>
+                <div class="d-flex align-items-center">
+                  <img src="{{ loan.cover or url_for('static', filename='default_cover.png') }}"
+                      alt="Book cover"
+                      class="rounded me-3 border"
+                      style="width:60px; height:85px; object-fit:cover;">
+                  <div>
+                    <div class="fw-bold">{{ loan['book_title'] }}</div>
+                    {% if loan.get('authors') %}
+                      <small class="text-muted">By {{ loan['authors'] | join(', ') }}</small>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
 
-          <!-- RIGHT: DETAILS -->
-          <div class="col-md-10">
-            <div class="card-body">
-              <h5 class="fw-bold">{{ loan['book_title'] }}</h5>
+              <!-- Due Date -->
+              <td class="text-center">
+                {{ due_date.strftime('%d %b %Y') }}
+                {% if overdue %}
+                  <div class="text-danger small fw-semibold">(Overdue)</div>
+                {% endif %}
+              </td>
 
-              <p class="mb-1">
-                <strong>Due Date:</strong>
-                {{ due_date.strftime('%d %b %Y') if due_date else '—' }}
-              </p>
+              <!-- Return Date -->
+              <td class="text-center">
+                {{ return_date.strftime('%d %b %Y') if return_date else '—' }}
+              </td>
 
-              <p class="mb-1">
-                <strong>Return Date:</strong>
-                {{ loan['returnDate'].strftime('%d %b %Y') if loan['returnDate'] else '—' }}
-              </p>
+              <!-- Renew Count -->
+              <td class="text-center">{{ loan['renewCount'] }}</td>
 
-              <p class="mb-1">
-                <strong>Renew Count:</strong> {{ loan['renewCount'] }}
-              </p>
-
-              <div class="d-flex gap-2 mt-2">
+              <!-- Actions -->
+              <td class="text-center">
                 {% if not return_date %}
                   {% if not overdue %}
                     {% if loan['renewCount'] < 2 %}
-                      <a href="{{ url_for('renew_loan', title=loan['book_title']) }}" class="btn btn-success btn-sm">
-                        Renew
-                      </a>
+                      <a href="{{ url_for('renew_loan', title=loan['book_title']) }}"
+                        class="btn btn-success btn-sm me-1">Renew</a>
                     {% endif %}
-                    <a href="{{ url_for('return_loan', title=loan['book_title']) }}" class="btn btn-success btn-sm">
-                      Return
-                    </a>
+                    <a href="{{ url_for('return_loan', title=loan['book_title']) }}"
+                      class="btn btn-success btn-sm">Return</a>
                   {% else %}
-                    <a href="{{ url_for('return_loan', title=loan['book_title']) }}" class="btn btn-success btn-sm">
-                      Return
-                    </a>
+                    <a href="{{ url_for('return_loan', title=loan['book_title']) }}"
+                      class="btn btn-success btn-sm">Return</a>
                   {% endif %}
                 {% else %}
-                  <a href="{{ url_for('delete_loan', title=loan['book_title']) }}" class="btn btn-danger btn-sm">
-                    Delete
-                  </a>
+                  <a href="{{ url_for('delete_loan', title=loan['book_title']) }}"
+                    class="btn btn-danger btn-sm">Delete</a>
                 {% endif %}
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
     <div class="text-center text-muted fs-5 p-4 border rounded bg-light">
       No loan currently
