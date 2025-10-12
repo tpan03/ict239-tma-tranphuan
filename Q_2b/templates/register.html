@@ -1,24 +1,63 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container mt-4">
-  <h3 class="fw-bold mb-3">Register</h3>
-  {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-  {% endif %}
-  <form method="post">
-    <div class="mb-3">
-      <label>Email</label>
-      <input type="email" name="email" class="form-control" placeholder="Enter email" required>
+<div class="container-fluid mt-4">
+  <!-- Page Header -->
+  <div class="p-2 mb-3" style="background-color: #c8e0c0;">
+    <h4 class="mb-0 fw-bold">REGISTER</h4>
+  </div>
+
+  <!-- Registration Form (Left-aligned) -->
+  <div class="row">
+    <div class="col-md-5 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Register</h4>
+
+          <form method="POST" action="{{ url_for('register') }}">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="Enter email"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                placeholder="Enter name"
+                required
+              />
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="mb-3">
-      <label>Password</label>
-      <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-    </div>
-    <div class="mb-3">
-      <label>Name</label>
-      <input type="text" name="name" class="form-control" placeholder="Enter name" required>
-    </div>
-    <button type="submit" class="btn btn-success">Submit</button>
-  </form>
+  </div>
 </div>
 {% endblock %}
