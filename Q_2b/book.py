@@ -54,9 +54,9 @@ class Book:
                     copies=b.get("copies", 0)
                 )
                 book_col.insert_one(new_book.to_dict())
-            print("✅ Book collection successfully created and populated.")
+            print("Book collection successfully created and populated.")
         else:
-            print("✅ Book collection already contains data.")
+            print("Book collection already contains data.")
         client.close()
 
     # ---------- RETRIEVAL ----------
@@ -75,10 +75,12 @@ class Book:
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
         book_col = db["books"]
+
         if category == "All":
             results = list(book_col.find({}, {"_id": 0}))
         else:
             results = list(book_col.find({"category": category}, {"_id": 0}))
+
         client.close()
         return results
 
@@ -95,18 +97,18 @@ class Book:
 
         book = book_col.find_one({"title": title})
         if not book:
-            print(f"❌ Book '{title}' not found.")
+            print(f"Book '{title}' not found.")
             client.close()
             return False
 
         if book["available"] <= 0:
-            print(f"⚠️ No available copies left for '{title}'.")
+            print(f"No available copies left for '{title}'.")
             client.close()
             return False
 
         # Decrease available count
         book_col.update_one({"title": title}, {"$inc": {"available": -1}})
-        print(f"✅ '{title}' has been borrowed. Remaining available: {book['available'] - 1}")
+        print(f"'{title}' has been borrowed. Remaining available: {book['available'] - 1}")
         client.close()
         return True
 
@@ -123,17 +125,17 @@ class Book:
 
         book = book_col.find_one({"title": title})
         if not book:
-            print(f"❌ Book '{title}' not found.")
+            print(f"Book '{title}' not found.")
             client.close()
             return False
 
         if book["available"] >= book["copies"]:
-            print(f"⚠️ All copies of '{title}' are already returned.")
+            print(f"All copies of '{title}' are already returned.")
             client.close()
             return False
 
         # Increase available count
         book_col.update_one({"title": title}, {"$inc": {"available": 1}})
-        print(f"✅ '{title}' has been returned. Available now: {book['available'] + 1}")
+        print(f"'{title}' has been returned. Available now: {book['available'] + 1}")
         client.close()
         return True

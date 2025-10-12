@@ -23,7 +23,6 @@
       left: 0;
       width: 250px;
       height: 100vh;
-      color: white;
       padding: 40px 20px;
       background:
         linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
@@ -38,8 +37,8 @@
 
     .sidebar h4 {
       font-weight: 700;
-      color: #fff;
       margin-bottom: 10px;
+      color: #fff;
     }
 
     .divider {
@@ -62,7 +61,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       color: white;
       text-decoration: none;
       margin: 15px 0;
@@ -101,7 +100,6 @@
       .sidebar {
         width: 100%;
         height: auto;
-        left: 0;
         top: -100vh;
         transition: top 0.4s ease-in-out, z-index 0s 0.4s;
         padding: 25px 10px;
@@ -149,44 +147,39 @@
       <div class="divider"></div>
     {% endif %}
 
-    <!-- Book Titles -->
+    <!-- Navigation Links -->
     <a href="{{ url_for('index') }}">
-      <i class="fas fa-book"></i> Book Titles
+      <i class="fa-solid fa-book"></i> Book Titles
     </a>
 
-    <!-- ✅ Loans: visible only to logged-in non-admin users -->
     {% if session.get('user') and not session['user']['is_admin'] %}
       <a href="{{ url_for('view_loans') }}">
-        <i class="fas fa-clipboard-list"></i> Loans
+        <i class="fa-solid fa-list-check"></i> Loans
       </a>
     {% endif %}
 
-    <!-- Admin-only: Add New Book -->
     {% if session.get('user') and session['user']['is_admin'] %}
       <a href="{{ url_for('new_book') }}">
-        <i class="fas fa-cloud-upload-alt"></i> New Book
+        <i class="fa-solid fa-plus"></i> New Book
       </a>
     {% endif %}
 
-    <!-- Auth links -->
     {% if session.get('user') %}
       <a href="{{ url_for('logout') }}">
-        <i class="fas fa-sign-out-alt"></i> Logout
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </a>
     {% else %}
       <a href="{{ url_for('login') }}">
-        <i class="fas fa-sign-in-alt"></i> Login
+        <i class="fa-solid fa-right-to-bracket"></i> Login
       </a>
       <a href="{{ url_for('register') }}">
-        <i class="fas fa-user-plus"></i> Register
+        <i class="fa-solid fa-user-plus"></i> Register
       </a>
     {% endif %}
   </div>
 
-  <!-- Main content area -->
+  <!-- Main Content Area -->
   <div class="content">
-    
-    <!-- ✅ FLASH MESSAGE SECTION -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="container mt-3">
@@ -199,7 +192,6 @@
         </div>
       {% endif %}
     {% endwith %}
-    <!-- ✅ END FLASH MESSAGE SECTION -->
 
     {% block content %}{% endblock %}
   </div>

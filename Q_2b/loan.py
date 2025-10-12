@@ -137,8 +137,10 @@ class Loan:
 
         loan_col.update_one(
             {"member_email": member_email, "book_title": book_title},
-            {"$set": {"borrowDate": new_borrow_date.strftime("%Y-%m-%d")},
-             "$inc": {"renewCount": 1}}
+            {
+                "$set": {"borrowDate": new_borrow_date.strftime("%Y-%m-%d")},
+                "$inc": {"renewCount": 1}
+            }
         )
         client.close()
         return "success"
@@ -168,7 +170,6 @@ class Loan:
         )
 
         Book.return_book(book_title)
-
         client.close()
         return True
 

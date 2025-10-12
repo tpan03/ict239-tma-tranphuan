@@ -2,7 +2,9 @@
 {% block content %}
 
 <!-- PAGE HEADER -->
-<h3 class="text-white text-center py-2" style="background-color:#1b7a43;">BOOK DETAILS</h3>
+<h3 class="text-white text-center py-2" style="background-color: #1b7a43;">
+  <i class="fa-solid fa-book-open"></i> BOOK DETAILS
+</h3>
 
 <!-- BOOK DETAIL CARD -->
 <div class="container mt-4 mb-4">
@@ -11,24 +13,32 @@
 
       <!-- LEFT COLUMN: Book Cover -->
       <div class="col-md-4 d-flex justify-content-center p-3">
-        <img src="{{ book['url'] }}" alt="{{ book['title'] }}" 
-             class="img-fluid rounded" 
-             style="max-height: 450px; object-fit: cover;">
+        <img 
+          src="{{ book['url'] }}" 
+          alt="{{ book['title'] }}" 
+          class="img-fluid rounded"
+          style="max-height: 450px; object-fit: cover;"
+        >
       </div>
 
       <!-- RIGHT COLUMN: Book Info -->
       <div class="col-md-8">
         <div class="card-body">
-          <h3 class="card-title text-success fw-bold">{{ book['title'] }}</h3>
+          <h3 class="card-title text-success fw-bold">
+            {{ book['title'] }}
+          </h3>
+
           <p><strong>Author(s):</strong> {{ book['authors'] | join(', ') }}</p>
           <p><strong>Category:</strong> {{ book['category'] }}</p>
           <p><strong>Pages:</strong> {{ book['pages'] }}</p>
-          <p><strong>Copies:</strong> {{ book['copies'] }} | 
-             <strong>Available:</strong> {{ book['available'] }}</p>
+          <p>
+            <strong>Copies:</strong> {{ book['copies'] }} |
+            <strong>Available:</strong> {{ book['available'] }}
+          </p>
 
           <hr>
 
-          <!-- Description paragraphs -->
+          <!-- Book Description -->
           {% for para in book['description'] %}
             <p>{{ para }}</p>
           {% endfor %}
@@ -37,19 +47,25 @@
     </div>
   </div>
 
-  <!-- ✅ BUTTON SECTION -->
+  <!-- BUTTON SECTION -->
   <div class="d-flex justify-content-end mt-3">
-    <!-- Always show "Back" button -->
-    <a href="{{ url_for('index') }}" class="btn btn-success me-2">Back to Book Titles</a>
+    <!-- Back button -->
+    <a href="{{ url_for('index') }}" class="btn btn-success me-2">
+      <i></i> Back to Book Titles
+    </a>
 
     <!-- Case 1: No copies available -->
     {% if book['available'] == 0 %}
-      <button class="btn btn-danger" disabled>Not Available</button>
+      <button class="btn btn-danger" disabled>
+        <i ></i> Not Available
+      </button>
 
     <!-- Case 2: Copies available -->
     {% else %}
       {% if not current_user or (current_user and not current_user.get('is_admin', False)) %}
-        <a href="{{ url_for('make_loan', title=book['title']) }}" class="btn btn-success">Make a Loan</a>
+        <a href="{{ url_for('make_loan', title=book['title']) }}" class="btn btn-success">
+          <i></i> Make a Loan
+        </a>
       {% endif %}
     {% endif %}
   </div>

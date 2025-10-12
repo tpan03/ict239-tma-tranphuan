@@ -32,9 +32,9 @@
               <td>
                 <div class="d-flex align-items-center">
                   <img src="{{ loan.cover or url_for('static', filename='default_cover.png') }}"
-                      alt="Book cover"
-                      class="rounded me-3 border"
-                      style="width:60px; height:85px; object-fit:cover;">
+                       alt="Book cover"
+                       class="rounded me-3 border"
+                       style="width:60px; height:85px; object-fit:cover;">
                   <div>
                     <div class="fw-bold">{{ loan['book_title'] }}</div>
                     {% if loan.get('authors') %}
@@ -66,17 +66,17 @@
                   {% if not overdue %}
                     {% if loan['renewCount'] < 2 %}
                       <a href="{{ url_for('renew_loan', title=loan['book_title']) }}"
-                        class="btn btn-success btn-sm me-1">Renew</a>
+                         class="btn btn-success btn-sm me-1">Renew</a>
                     {% endif %}
                     <a href="{{ url_for('return_loan', title=loan['book_title']) }}"
-                      class="btn btn-success btn-sm">Return</a>
+                       class="btn btn-success btn-sm">Return</a>
                   {% else %}
                     <a href="{{ url_for('return_loan', title=loan['book_title']) }}"
-                      class="btn btn-success btn-sm">Return</a>
+                       class="btn btn-success btn-sm">Return</a>
                   {% endif %}
                 {% else %}
                   <a href="{{ url_for('delete_loan', title=loan['book_title']) }}"
-                    class="btn btn-danger btn-sm">Delete</a>
+                     class="btn btn-danger btn-sm">Delete</a>
                 {% endif %}
               </td>
             </tr>
