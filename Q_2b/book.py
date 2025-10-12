@@ -33,10 +33,10 @@ class Book:
 
     @classmethod
     def initialize_collection(cls):
-        """Populate MongoDB 'Book' collection from all_books if empty."""
+        """Populate MongoDB 'books' collection from all_books if empty."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
 
         if book_col.count_documents({}) == 0:
             print("Book collection empty — populating from all_books...")
@@ -64,7 +64,7 @@ class Book:
         """Retrieve all book documents from MongoDB."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
         books = list(book_col.find({}, {"_id": 0}))
         client.close()
         return books
@@ -74,7 +74,7 @@ class Book:
         """Retrieve books filtered by category."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
 
         if category == "All":
             results = list(book_col.find({}, {"_id": 0}))
@@ -83,4 +83,3 @@ class Book:
 
         client.close()
         return results
-

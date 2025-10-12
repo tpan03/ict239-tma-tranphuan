@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+
 <!-- BOOK TITLES HEADER -->
 <h3 class="text-white text-center py-2" style="background-color:#1b7a43;">BOOK TITLES</h3>
 
@@ -8,17 +9,16 @@
   <div class="mb-2 mb-md-0">
     <strong>Number of titles:</strong> {{ total }}
   </div>
-<form method="get" action="/" class="d-flex align-items-center">
-  <label for="category" class="me-2 fw-bold">Category:</label>
-  <select name="category" id="category" class="form-select w-auto">
-    <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All</option>
-    {% for cat in categories %}
-      <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" class="btn btn-success ms-2">Search</button>
-</form>
-
+  <form method="get" action="/" class="d-flex align-items-center">
+    <label for="category" class="me-2 fw-bold">Category:</label>
+    <select name="category" id="category" class="form-select w-auto">
+      <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-success ms-2">Search</button>
+  </form>
 </div>
 
 <!-- BOOK CARDS -->
@@ -58,4 +58,5 @@
     <p class="text-center text-danger mt-4">No books found for this category.</p>
   {% endif %}
 </div>
+
 {% endblock %}

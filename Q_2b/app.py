@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from pymongo import MongoClient
 from book import Book
 from user import User
@@ -23,7 +23,7 @@ def index():
 
     client = MongoClient("mongodb://localhost:27017/")
     db = client["libraryDB"]
-    categories = sorted(db["Book"].distinct("category"))
+    categories = sorted(db["books"].distinct("category"))  # ✅ lowercase
     client.close()
 
     return render_template(
@@ -31,7 +31,7 @@ def index():
         books=books,
         categories=categories,
         selected_category=category,
-        count=count
+        total=count
     )
 
 # ---------- REGISTER ----------
@@ -76,15 +76,16 @@ def logout():
 def book_detail(title):
     client = MongoClient("mongodb://localhost:27017/")
     db = client["libraryDB"]
-    book = db["Book"].find_one({"title": title}, {"_id": 0})
+    book = db["books"].find_one({"title": title}, {"_id": 0})  # ✅ lowercase
     client.close()
     return render_template('book_detail.html', book=book)
 
+# ---------- ADD NEW BOOK (ADMIN ONLY) ----------
 @app.route('/new_book', methods=['GET', 'POST'])
 def new_book():
     if 'user' not in session or not session['user']['is_admin']:
         flash('Access denied. Admins only.', 'danger')
-        return redirect(url_for('book_titles'))
+        return redirect(url_for('index'))
 
     genres_list = [
         "Animals", "Business", "Comics", "Communication", "Dark Academia", "Emotion",
@@ -103,7 +104,6 @@ def new_book():
         copies = request.form.get('copies')
         genres = request.form.getlist('genres')
 
-        # Collect authors and illustrators
         authors = []
         for i in range(1, 6):
             author_name = request.form.get(f'author{i}')
@@ -111,20 +111,21 @@ def new_book():
             if author_name:
                 authors.append({'name': author_name, 'illustrator': is_illustrator})
 
-        # Save to MongoDB
-        book = {
+        client = MongoClient("mongodb://localhost:27017/")
+        db = client["libraryDB"]
+        db.books.insert_one({                      # ✅ lowercase collection
             'title': title,
             'category': category,
-            'cover_url': cover_url,
-            'description': description,
+            'url': cover_url,                      # ✅ consistent with index.html
+            'description': [description],          # ✅ stored as list
             'pages': int(pages),
             'copies': int(copies),
             'available': int(copies),
             'genres': genres,
-            'authors': authors
-        }
+            'authors': [a['name'] for a in authors]  # ✅ same format as all_books
+        })
+        client.close()
 
-        mongo.db.books.insert_one(book)
         flash(f'"{title}" has been successfully added!', 'success')
         return redirect(url_for('new_book'))
 
