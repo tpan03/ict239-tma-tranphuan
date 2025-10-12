@@ -8,16 +8,17 @@
   <div class="mb-2 mb-md-0">
     <strong>Number of titles:</strong> {{ total }}
   </div>
-  <form method="POST" class="d-flex flex-wrap align-items-center">
-    <label for="category" class="me-2 fw-bold">Category:</label>
-    <select name="category" id="category" class="form-select me-2 mb-2 mb-sm-0" style="width:auto;">
-      <option value="All" {% if category == 'All' %}selected{% endif %}>All</option>
-      <option value="Children" {% if category == 'Children' %}selected{% endif %}>Children</option>
-      <option value="Teens" {% if category == 'Teens' %}selected{% endif %}>Teens</option>
-      <option value="Adult" {% if category == 'Adult' %}selected{% endif %}>Adult</option>
-    </select>
-    <button type="submit" class="btn btn-success">Search</button>
-  </form>
+<form method="get" action="/" class="d-flex align-items-center">
+  <label for="category" class="me-2 fw-bold">Category:</label>
+  <select name="category" id="category" class="form-select w-auto">
+    <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All</option>
+    {% for cat in categories %}
+      <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-success ms-2">Search</button>
+</form>
+
 </div>
 
 <!-- BOOK CARDS -->

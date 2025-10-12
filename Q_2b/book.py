@@ -71,15 +71,16 @@ class Book:
 
     @classmethod
     def get_books_by_category(cls, category: str):
-        """Retrieve books filtered by category (e.g., 'Adult', 'Teens')."""
+        """Retrieve books filtered by category."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
         book_col = db["Book"]
 
-        if category.lower() == "all":
+        if category == "All":
             results = list(book_col.find({}, {"_id": 0}))
         else:
             results = list(book_col.find({"category": category}, {"_id": 0}))
 
         client.close()
         return results
+
