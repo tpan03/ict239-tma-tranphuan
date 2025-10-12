@@ -102,7 +102,7 @@
         width: 100%;
         height: auto;
         left: 0;
-        top: -100vh; /* start hidden above */
+        top: -100vh;
         transition: top 0.4s ease-in-out, z-index 0s 0.4s;
         padding: 25px 10px;
         z-index: -1;
@@ -149,19 +149,16 @@
       <div class="divider"></div>
     {% endif %}
 
-    <!-- Book Titles (always visible) -->
     <a href="{{ url_for('index') }}">
       <i class="fas fa-book"></i> Book Titles
     </a>
 
-    <!-- ✅ ADD NEW BOOK BUTTON (for admin only) -->
     {% if session.get('user') and session['user']['is_admin'] %}
       <a href="{{ url_for('new_book') }}">
         <i class="fas fa-cloud-upload-alt"></i> New Book
       </a>
     {% endif %}
 
-    <!-- Login/Logout Links -->
     {% if session.get('user') %}
       <a href="{{ url_for('logout') }}">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -176,19 +173,16 @@
     {% endif %}
   </div>
 
-  <!-- Main content -->
   <div class="content">
     {% block content %}{% endblock %}
   </div>
 
   <script>
-    // Toggle sidebar open/close
     function toggleMenu() {
       const sidebar = document.getElementById("sidebar");
       sidebar.classList.toggle("active");
     }
 
-    // Close sidebar if user clicks outside (mobile)
     document.addEventListener("click", function (e) {
       const sidebar = document.getElementById("sidebar");
       const toggle = document.querySelector(".menu-toggle");
