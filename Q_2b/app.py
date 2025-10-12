@@ -80,5 +80,55 @@ def book_detail(title):
     client.close()
     return render_template('book_detail.html', book=book)
 
+@app.route('/new_book', methods=['GET', 'POST'])
+def new_book():
+    if 'user' not in session or not session['user']['is_admin']:
+        flash('Access denied. Admins only.', 'danger')
+        return redirect(url_for('book_titles'))
+
+    genres_list = [
+        "Animals", "Business", "Comics", "Communication", "Dark Academia", "Emotion",
+        "Fantasy", "Fiction", "Friendship", "Graphic Novels", "Grief", "Historical Fiction",
+        "Indigenous", "Inspirational", "Magic", "Mental Health", "Nonfiction", "Personal Development",
+        "Philosophy", "Picture Books", "Poetry", "Productivity", "Psychology", "Romance",
+        "School", "Self Help"
+    ]
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        category = request.form.get('category')
+        cover_url = request.form.get('cover_url')
+        description = request.form.get('description')
+        pages = request.form.get('pages')
+        copies = request.form.get('copies')
+        genres = request.form.getlist('genres')
+
+        # Collect authors and illustrators
+        authors = []
+        for i in range(1, 6):
+            author_name = request.form.get(f'author{i}')
+            is_illustrator = f'illustrator{i}' in request.form
+            if author_name:
+                authors.append({'name': author_name, 'illustrator': is_illustrator})
+
+        # Save to MongoDB
+        book = {
+            'title': title,
+            'category': category,
+            'cover_url': cover_url,
+            'description': description,
+            'pages': int(pages),
+            'copies': int(copies),
+            'available': int(copies),
+            'genres': genres,
+            'authors': authors
+        }
+
+        mongo.db.books.insert_one(book)
+        flash(f'"{title}" has been successfully added!', 'success')
+        return redirect(url_for('new_book'))
+
+    return render_template('new_book.html', genres=genres_list)
+
 if __name__ == '__main__':
     app.run(debug=True)

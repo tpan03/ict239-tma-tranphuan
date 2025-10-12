@@ -103,17 +103,17 @@
         height: auto;
         left: 0;
         top: -100vh; /* start hidden above */
-        transition: top 0.4s ease-in-out, z-index 0s 0.4s; /* delay z-index change */
+        transition: top 0.4s ease-in-out, z-index 0s 0.4s;
         padding: 25px 10px;
-        z-index: -1; /* ensure it’s behind when hidden */
-        pointer-events: none; /* prevent blocking clicks */
+        z-index: -1;
+        pointer-events: none;
       }
 
       .sidebar.active {
-        top: 0; /* slide down */
-        z-index: 1500; /* bring forward */
-        pointer-events: auto; /* clickable */
-        transition: top 0.4s ease-in-out; /* smooth animation */
+        top: 0;
+        z-index: 1500;
+        pointer-events: auto;
+        transition: top 0.4s ease-in-out;
       }
 
       .menu-toggle {
@@ -154,6 +154,14 @@
       <i class="fas fa-book"></i> Book Titles
     </a>
 
+    <!-- ✅ ADD NEW BOOK BUTTON (for admin only) -->
+    {% if session.get('user') and session['user']['is_admin'] %}
+      <a href="{{ url_for('new_book') }}">
+        <i class="fas fa-cloud-upload-alt"></i> New Book
+      </a>
+    {% endif %}
+
+    <!-- Login/Logout Links -->
     {% if session.get('user') %}
       <a href="{{ url_for('logout') }}">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -180,7 +188,7 @@
       sidebar.classList.toggle("active");
     }
 
-    // Optional: Close sidebar if user clicks outside it (for mobile UX)
+    // Close sidebar if user clicks outside (mobile)
     document.addEventListener("click", function (e) {
       const sidebar = document.getElementById("sidebar");
       const toggle = document.querySelector(".menu-toggle");
