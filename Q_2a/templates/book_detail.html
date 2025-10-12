@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mt-3 shadow-sm border-success">
+  <div class="row g-0">
+    <!-- Book cover -->
+    <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
+      <img src="{{ book['url'] }}" class="img-fluid rounded-start" alt="{{ book['title'] }}">
+    </div>
+
+    <!-- Book details -->
+    <div class="col-md-8">
+      <div class="card-body">
+        <h3 class="card-title text-success">{{ book['title'] }}</h3>
+        <p class="fw-bold mb-1">Author(s): {{ book['authors'] | join(', ') }}</p>
+        <p class="mb-1"><strong>Category:</strong> {{ book['category'] }}</p>
+        <p class="mb-1"><strong>Pages:</strong> {{ book['pages'] }}</p>
+        <p class="mb-1"><strong>Copies:</strong> {{ book['copies'] }} | 
+          <strong>Available:</strong> {{ book['available'] }}</p>
+
+        <hr>
+
+        <!-- Full Description -->
+        <h5 class="text-success mt-3">Description</h5>
+        {% for paragraph in book['description'] %}
+          <p>{{ paragraph }}</p>
+        {% endfor %}
+
+        <!-- Back button -->
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Book Titles</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
