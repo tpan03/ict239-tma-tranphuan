@@ -4,20 +4,29 @@ from datetime import datetime, timedelta
 import random
 from book import Book
 from user import User
-from loan import Loan  # ✅ You'll need your Loan class defined for Part (c)
+from loan import Loan
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
+
 # ---------- INITIALIZE ----------
 Book.initialize_collection()
 
+
+# ---------- CONTEXT PROCESSORS ----------
+@app.context_processor
+def inject_globals():
+    """Make 'now' and 'timedelta' available in all templates."""
+    return {
+        'now': datetime.now(),
+        'timedelta': timedelta
+    }
+
+
 @app.context_processor
 def inject_user():
-    """
-    Makes `current_user` always available in templates.
-    If no one is logged in, returns a dummy guest object with is_admin=False.
-    """
+    """Make current_user always available in templates."""
     user = session.get("user")
     if user is None:
         user = {"email": None, "name": "Guest", "is_admin": False}
@@ -150,51 +159,113 @@ def new_book():
 # ---------- MAKE A LOAN ----------
 @app.route('/make_loan/<string:title>')
 def make_loan(title):
-    """
-    Handles the Make a Loan function.
-    Shows flash messages for login prompts, duplicate loans, and success.
-    """
-
-    # ✅ 1. Check login
     if 'user' not in session:
-        flash('Please login or register first to get an account.', 'warning')
+        flash('Please login or register first to make a loan.', 'warning')
         return redirect(url_for('login'))
 
-    # ✅ 2. Block admin from borrowing
     if session['user'].get('is_admin', False):
         flash('Admins cannot make loans.', 'danger')
         return redirect(url_for('book_detail', title=title))
 
     user_email = session['user']['email']
+    borrow_date = datetime.now()
 
-    # ✅ 3. Random borrow date (10–20 days before today)
-    borrow_date = datetime.now() - timedelta(days=random.randint(10, 20))
-
-    # ✅ 4. Check existing active loan
     loan_exists = Loan.get_loan(user_email, title)
     if loan_exists and loan_exists.get('returnDate') is None:
         flash(f'You already have an active loan for "{title}".', 'danger')
         return redirect(url_for('book_detail', title=title))
 
-    # ✅ 5. Check availability
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["libraryDB"]
-    book = db.books.find_one({'title': title})
-
-    if not book or book['available'] <= 0:
+    success = Loan.create_loan(user_email, title, borrow_date)
+    if not success:
         flash(f'"{title}" is currently not available for loan.', 'danger')
-        client.close()
         return redirect(url_for('book_detail', title=title))
 
-    # ✅ 6. Create Loan document
-    Loan.create_loan(user_email, title, borrow_date)
-
-    # ✅ 7. Decrease available count
-    db.books.update_one({'title': title}, {'$inc': {'available': -1}})
-    client.close()
-
-    flash(f'Successfully borrowed "{title}" on {borrow_date.strftime("%Y-%m-%d")}.', 'success')
+    flash(f'Successfully borrowed "{title}"!', 'success')
     return redirect(url_for('book_detail', title=title))
+
+
+# ---------- VIEW LOANS ----------
+@app.route('/loans')
+def view_loans():
+    if 'user' not in session:
+        flash('Please login to view your loans.', 'warning')
+        return redirect(url_for('login'))
+
+    if session['user'].get('is_admin', False):
+        flash('Admins do not have personal loans.', 'info')
+        return redirect(url_for('index'))
+
+    user_email = session['user']['email']
+    loans = Loan.get_all_loans_for_user(user_email)
+
+    # ✅ Convert string dates to datetime safely
+    for loan in loans:
+        try:
+            if isinstance(loan.get('borrowDate'), str):
+                loan['borrowDate'] = datetime.strptime(loan['borrowDate'], '%Y-%m-%d')
+            if isinstance(loan.get('returnDate'), str) and loan.get('returnDate'):
+                loan['returnDate'] = datetime.strptime(loan['returnDate'], '%Y-%m-%d')
+        except Exception:
+            pass
+
+    loans.sort(key=lambda x: x['borrowDate'], reverse=True)
+    return render_template('loan.html', loans=loans)
+
+
+# ---------- RENEW LOAN ----------
+@app.route('/renew_loan/<string:title>')
+def renew_loan(title):
+    if 'user' not in session:
+        flash('Please login to renew a loan.', 'warning')
+        return redirect(url_for('login'))
+
+    user_email = session['user']['email']
+    result = Loan.renew_loan(user_email, title)
+
+    if result == "maxed":
+        flash('Maximum renewal limit reached (2 times).', 'danger')
+    elif result == "not_found":
+        flash('No active loan found to renew.', 'danger')
+    else:
+        flash(f'Loan for "{title}" successfully renewed.', 'success')
+
+    return redirect(url_for('view_loans'))
+
+
+# ---------- RETURN LOAN ----------
+@app.route('/return_loan/<string:title>')
+def return_loan(title):
+    if 'user' not in session:
+        flash('Please login to return a book.', 'warning')
+        return redirect(url_for('login'))
+
+    user_email = session['user']['email']
+    result = Loan.return_loan(user_email, title)
+
+    if result:
+        flash(f'"{title}" returned successfully!', 'success')
+    else:
+        flash(f'Unable to return "{title}".', 'danger')
+
+    return redirect(url_for('view_loans'))
+
+
+# ---------- DELETE LOAN ----------
+@app.route('/delete_loan/<string:title>')
+def delete_loan(title):
+    if 'user' not in session:
+        flash('Please login to delete loan history.', 'warning')
+        return redirect(url_for('login'))
+
+    user_email = session['user']['email']
+    result = Loan.delete_loan(user_email, title)
+
+    if result:
+        flash(f'Loan record for "{title}" deleted.', 'info')
+    else:
+        flash(f'No loan record found for "{title}".', 'danger')
+
+    return redirect(url_for('view_loans'))
 
 
 # ---------- MAIN ----------
