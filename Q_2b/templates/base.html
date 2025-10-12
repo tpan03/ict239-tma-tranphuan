@@ -1,195 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SG Library</title>
 
-  <!-- Bootstrap & FontAwesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Sidebar (desktop) */
+    /* Sidebar styling */
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 250px;
       height: 100vh;
+      background: rgba(0, 0, 0, 0.7) url('https://library.suss.edu.sg/wp-content/uploads/2023/11/Study-Space_High-table-2-cropped-300x200.png') center/cover no-repeat;
+      background-blend-mode: darken;
       color: white;
-      padding: 40px 20px;
-      background:
-        linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
-        url("https://library.suss.edu.sg/wp-content/uploads/2023/11/Study-Space_High-table-2-cropped-300x200.png")
-        center center / cover no-repeat;
-      background-attachment: fixed;
-      text-align: center;
-      color: #fff;
-      transition: 0.3s ease-in-out;
-      z-index: 1000;
+      padding: 30px 20px;
     }
 
     .sidebar h4 {
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-
-    .divider {
-      height: 2px;
-      width: 100%;
-      background-color: rgba(255, 255, 255, 0.7);
-      margin: 10px 0 25px 0;
-    }
-
-    .admin-photo {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 10px;
-      border: 3px solid rgba(255, 255, 255, 0.8);
+      font-weight: bold;
+      border-bottom: 3px solid #fff;
+      display: inline-block;
+      padding-bottom: 5px;
     }
 
     .sidebar a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       color: white;
       text-decoration: none;
-      margin: 15px 0;
-      font-size: 1rem;
-      transition: all 0.2s ease-in-out;
     }
 
     .sidebar a:hover {
-      color: #004d2c;
-      transform: translateX(5px);
+      color: #c8e0c0;
     }
 
-    /* Main content */
-    .content {
-      margin-left: 260px;
+    .nav-item {
+      margin-bottom: 18px;
+    }
+
+    /* Admin photo inline with text */
+    .admin-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .admin-info {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+
+    /* Navbar styling */
+    .navbar {
+      background-color: #0d6efd;
+    }
+
+    .navbar-toggler {
+      border: none;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: none;
+    }
+
+    /* Main content area */
+    .main-content {
+      background-color: #f8f9fa;
       padding: 20px;
+      height: 100vh;
+      overflow-y: auto;
     }
 
-    /* Burger toggle */
-    .menu-toggle {
-      display: none;
-      font-size: 1.8rem;
-      cursor: pointer;
-      position: fixed;
-      top: 15px;
-      right: 20px;
-      z-index: 2001;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      border-radius: 8px;
-      padding: 5px 10px;
-    }
-
-    /* Mobile view */
-    @media (max-width: 768px) {
+    @media (max-width: 991px) {
       .sidebar {
-        width: 100%;
         height: auto;
-        left: 0;
-        top: -100vh; /* start hidden above */
-        transition: top 0.4s ease-in-out, z-index 0s 0.4s; /* delay z-index change */
-        padding: 25px 10px;
-        z-index: -1; /* ensure it’s behind when hidden */
-        pointer-events: none; /* prevent blocking clicks */
+        padding: 15px;
       }
-
-      .sidebar.active {
-        top: 0; /* slide down */
-        z-index: 1500; /* bring forward */
-        pointer-events: auto; /* clickable */
-        transition: top 0.4s ease-in-out; /* smooth animation */
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      .content {
-        margin-left: 0;
-        padding-top: 70px;
+      .main-content {
+        height: auto;
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Burger Menu -->
-  <div class="menu-toggle" onclick="toggleMenu()">
-    <i class="fas fa-bars"></i>
+  <!-- Navbar (for smaller screens) -->
+  <nav class="navbar navbar-expand-lg navbar-dark d-lg-none">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">SG Library</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse text-center" id="navbarNav">
+        <ul class="navbar-nav ms-auto mt-2">
+          {% if 'user' in session %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('book_titles') }}">Book Titles</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-3 col-md-4 sidebar d-none d-lg-block">
+        <h4>SG Library</h4>
+        <hr style="border-top: 2px solid white; width: 80%; margin: 15px 0;">
+
+        {% if 'user' in session %}
+          {% if session['user']['is_admin'] %}
+            <div class="admin-info">
+              <img src="{{ url_for('static', filename='admin.png') }}" alt="Admin Photo" class="admin-icon">
+              <span class="fw-semibold text-white">Admin</span>
+            </div>
+          {% else %}
+            <div class="admin-info">
+              <i class="bi bi-person-circle fs-3 text-white"></i>
+              <span class="fw-semibold text-white">{{ session['user']['name'] }}</span>
+            </div>
+          {% endif %}
+          <hr style="border-top: 2px solid white; width: 80%; margin: 15px 0;">
+          <div class="nav-item">
+            <i class="bi bi-journal-text me-2"></i><a href="{{ url_for('book_titles') }}">Book Titles</a>
+          </div>
+          <div class="nav-item">
+            <i class="bi bi-box-arrow-right me-2"></i><a href="{{ url_for('logout') }}">Logout</a>
+          </div>
+        {% else %}
+          <hr style="border-top: 2px solid white; width: 80%; margin: 15px 0;">
+          <div class="nav-item">
+            <i class="bi bi-journal-text me-2"></i><a href="{{ url_for('book_titles') }}">Book Titles</a>
+          </div>
+          <div class="nav-item">
+            <i class="bi bi-box-arrow-in-right me-2"></i><a href="{{ url_for('login') }}">Login</a>
+          </div>
+          <div class="nav-item">
+            <i class="bi bi-person-plus me-2"></i><a href="{{ url_for('register') }}">Register</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-9 col-md-8 main-content">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
   </div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <h4>SG Library</h4>
-    <div class="divider"></div>
-
-    {% if session.get('user') %}
-      {% if session['user']['is_admin'] %}
-        <img src="{{ url_for('static', filename='admin.png') }}" alt="Admin Photo" class="admin-photo">
-        <p class="fw-bold text-white">Admin</p>
-      {% else %}
-        <p class="fw-bold text-white">{{ session['user']['name'] }}</p>
-      {% endif %}
-      <div class="divider"></div>
-    {% endif %}
-
-    <!-- Book Titles (always visible) -->
-    <a href="{{ url_for('index') }}">
-      <i class="fas fa-book"></i> Book Titles
-    </a>
-
-    {% if session.get('user') %}
-      <a href="{{ url_for('logout') }}">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </a>
-    {% else %}
-      <a href="{{ url_for('login') }}">
-        <i class="fas fa-sign-in-alt"></i> Login
-      </a>
-      <a href="{{ url_for('register') }}">
-        <i class="fas fa-user-plus"></i> Register
-      </a>
-    {% endif %}
-  </div>
-
-  <!-- Main content -->
-  <div class="content">
-    {% block content %}{% endblock %}
-  </div>
-
-  <script>
-    // Toggle sidebar open/close
-    function toggleMenu() {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.classList.toggle("active");
-    }
-
-    // Optional: Close sidebar if user clicks outside it (for mobile UX)
-    document.addEventListener("click", function (e) {
-      const sidebar = document.getElementById("sidebar");
-      const toggle = document.querySelector(".menu-toggle");
-      if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
-        sidebar.classList.remove("active");
-      }
-    });
-  </script>
-
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
