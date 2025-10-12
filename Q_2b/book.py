@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from typing import List
-from books import all_books
+from books import all_books  # provided data file
 
 
 class Book:
@@ -18,6 +18,7 @@ class Book:
         self.copies = copies
 
     def to_dict(self):
+        """Convert the Book object into a MongoDB-storable dictionary."""
         return {
             "genres": self.genres,
             "title": self.title,
@@ -30,14 +31,16 @@ class Book:
             "copies": self.copies
         }
 
+    # ---------- INITIALIZE COLLECTION ----------
     @classmethod
     def initialize_collection(cls):
+        """Populate MongoDB 'Book' collection from all_books if empty."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        col = db["books"]
+        book_col = db["Book"]
 
-        if col.count_documents({}) == 0:
-            print("Book collection empty — populating...")
+        if book_col.count_documents({}) == 0:
+            print("Book collection empty — populating from all_books...")
             for b in all_books:
                 new_book = Book(
                     genres=b.get("genres", []),
@@ -50,31 +53,87 @@ class Book:
                     available=b.get("available", 0),
                     copies=b.get("copies", 0)
                 )
-                col.insert_one(new_book.to_dict())
-            print("✅ Collection populated.")
+                book_col.insert_one(new_book.to_dict())
+            print("✅ Book collection successfully created and populated.")
         else:
-            print("✅ Collection already populated.")
+            print("✅ Book collection already contains data.")
         client.close()
+
+    # ---------- RETRIEVAL ----------
+    @classmethod
+    def get_all_books(cls):
+        """Retrieve all book documents from MongoDB."""
+        client = MongoClient("mongodb://localhost:27017/")
+        db = client["libraryDB"]
+        books = list(db["Book"].find({}, {"_id": 0}))
+        client.close()
+        return books
 
     @classmethod
     def get_books_by_category(cls, category: str):
+        """Retrieve books filtered by category."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        col = db["books"]
-
+        book_col = db["Book"]
         if category == "All":
-            results = list(col.find({}, {"_id": 0}))
+            results = list(book_col.find({}, {"_id": 0}))
         else:
-            results = list(col.find({"category": category}, {"_id": 0}))
-
+            results = list(book_col.find({"category": category}, {"_id": 0}))
         client.close()
         return results
 
+    # ---------- NEW: BORROW BOOK ----------
     @classmethod
-    def update_availability(cls, title: str, change: int):
-        """Increase or decrease 'available' count by 'change'."""
+    def borrow_book(cls, title: str) -> bool:
+        """
+        Borrow a book (decrease available count by 1) if available.
+        Returns True if successful, False otherwise.
+        """
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        col = db["books"]
-        col.update_one({"title": title}, {"$inc": {"available": change}})
+        book_col = db["Book"]
+
+        book = book_col.find_one({"title": title})
+        if not book:
+            print(f"❌ Book '{title}' not found.")
+            client.close()
+            return False
+
+        if book["available"] <= 0:
+            print(f"⚠️ No available copies left for '{title}'.")
+            client.close()
+            return False
+
+        # Decrease available count
+        book_col.update_one({"title": title}, {"$inc": {"available": -1}})
+        print(f"✅ '{title}' has been borrowed. Remaining available: {book['available'] - 1}")
         client.close()
+        return True
+
+    # ---------- NEW: RETURN BOOK ----------
+    @classmethod
+    def return_book(cls, title: str) -> bool:
+        """
+        Return a borrowed book (increase available count by 1).
+        Ensures available does not exceed total copies.
+        """
+        client = MongoClient("mongodb://localhost:27017/")
+        db = client["libraryDB"]
+        book_col = db["Book"]
+
+        book = book_col.find_one({"title": title})
+        if not book:
+            print(f"❌ Book '{title}' not found.")
+            client.close()
+            return False
+
+        if book["available"] >= book["copies"]:
+            print(f"⚠️ All copies of '{title}' are already returned.")
+            client.close()
+            return False
+
+        # Increase available count
+        book_col.update_one({"title": title}, {"$inc": {"available": 1}})
+        print(f"✅ '{title}' has been returned. Available now: {book['available'] + 1}")
+        client.close()
+        return True
