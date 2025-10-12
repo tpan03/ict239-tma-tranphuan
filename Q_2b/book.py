@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from typing import List
-from books import all_books  # provided file with book data
+from books import all_books
 
 
 class Book:
@@ -18,7 +18,6 @@ class Book:
         self.copies = copies
 
     def to_dict(self):
-        """Convert the Book object into a MongoDB-storable dictionary."""
         return {
             "genres": self.genres,
             "title": self.title,
@@ -33,13 +32,12 @@ class Book:
 
     @classmethod
     def initialize_collection(cls):
-        """Populate MongoDB 'books' collection from all_books if empty."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["books"]
+        col = db["books"]
 
-        if book_col.count_documents({}) == 0:
-            print("Book collection empty — populating from all_books...")
+        if col.count_documents({}) == 0:
+            print("Book collection empty — populating...")
             for b in all_books:
                 new_book = Book(
                     genres=b.get("genres", []),
@@ -52,34 +50,31 @@ class Book:
                     available=b.get("available", 0),
                     copies=b.get("copies", 0)
                 )
-                book_col.insert_one(new_book.to_dict())
-            print("✅ Book collection successfully created and populated.")
+                col.insert_one(new_book.to_dict())
+            print("✅ Collection populated.")
         else:
-            print("✅ Book collection already contains data.")
-
+            print("✅ Collection already populated.")
         client.close()
-
-    @classmethod
-    def get_all_books(cls):
-        """Retrieve all book documents from MongoDB."""
-        client = MongoClient("mongodb://localhost:27017/")
-        db = client["libraryDB"]
-        book_col = db["books"]
-        books = list(book_col.find({}, {"_id": 0}))
-        client.close()
-        return books
 
     @classmethod
     def get_books_by_category(cls, category: str):
-        """Retrieve books filtered by category."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["books"]
+        col = db["books"]
 
         if category == "All":
-            results = list(book_col.find({}, {"_id": 0}))
+            results = list(col.find({}, {"_id": 0}))
         else:
-            results = list(book_col.find({"category": category}, {"_id": 0}))
+            results = list(col.find({"category": category}, {"_id": 0}))
 
         client.close()
         return results
+
+    @classmethod
+    def update_availability(cls, title: str, change: int):
+        """Increase or decrease 'available' count by 'change'."""
+        client = MongoClient("mongodb://localhost:27017/")
+        db = client["libraryDB"]
+        col = db["books"]
+        col.update_one({"title": title}, {"$inc": {"available": change}})
+        client.close()

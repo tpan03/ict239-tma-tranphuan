@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- BOOK TITLES HEADER -->
+<!-- PAGE HEADER -->
 <h3 class="text-white text-center py-2" style="background-color:#1b7a43;">BOOK TITLES</h3>
 
-<!-- SEARCH ROW -->
+<!-- CATEGORY SELECTION BAR -->
 <div class="d-flex flex-wrap justify-content-between align-items-center py-2 px-3" style="background-color:#cde5cf;">
   <div class="mb-2 mb-md-0">
     <strong>Number of titles:</strong> {{ total }}
@@ -21,32 +21,40 @@
   </form>
 </div>
 
-<!-- BOOK CARDS -->
+<!-- BOOK LIST -->
 <div class="container-fluid mt-3">
   {% for b in books %}
   <div class="card mb-4 shadow-sm border-success">
     <div class="row g-0 align-items-center">
-      <!-- IMAGE COLUMN -->
+
+      <!-- LEFT: BOOK COVER -->
       <div class="col-12 col-md-3 d-flex justify-content-center p-2">
         <img src="{{ b['url'] }}" alt="{{ b['title'] }}" class="img-fluid rounded" style="max-height: 320px; object-fit: cover;">
       </div>
 
-      <!-- TEXT COLUMN -->
+      <!-- RIGHT: BOOK DETAILS -->
       <div class="col-12 col-md-9">
         <div class="card-body">
           <h5 class="card-title text-success fw-bold">{{ b['title'] }}</h5>
           <p class="mb-1"><strong>Author(s):</strong> {{ b['authors'] | join(', ') }}</p>
-          <p class="mb-1"><strong>Category:</strong> {{ b['category'] }} &nbsp; | &nbsp; <strong>Pages:</strong> {{ b['pages'] }}</p>
-          <p class="mb-1"><strong>Copies:</strong> {{ b['copies'] }} &nbsp; | &nbsp; <strong>Available:</strong> {{ b['available'] }}</p>
+          <p class="mb-1"><strong>Category:</strong> {{ b['category'] }} | <strong>Pages:</strong> {{ b['pages'] }}</p>
+          <p class="mb-1"><strong>Copies:</strong> {{ b['copies'] }} | <strong>Available:</strong> {{ b['available'] }}</p>
 
-          <p class="mt-2">{{ b['description'][0] }}</p>
-          {% if b['description']|length > 1 %}
-          <p>{{ b['description'][-1] }}</p>
+          <!-- Only show first + last paragraph -->
+          {% if b['description'] %}
+            <p class="mt-2">{{ b['description'][0] }}</p>
+            {% if b['description']|length > 1 %}
+              <p>{{ b['description'][-1] }}</p>
+            {% endif %}
           {% endif %}
 
-          <!-- BUTTON BOTTOM RIGHT -->
-          <div class="d-flex justify-content-end">
+          <!-- BUTTONS -->
+          <div class="d-flex justify-content-end gap-2">
             <a href="{{ url_for('book_detail', title=b['title']) }}" class="btn btn-success mt-2">More details</a>
+            {% if b['available'] > 0 %}
+              <!-- ✅ Changed from blue to green -->
+              <a href="{{ url_for('make_loan', title=b['title']) }}" class="btn btn-success mt-2">Make a Loan</a>
+            {% endif %}
           </div>
         </div>
       </div>

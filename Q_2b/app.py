@@ -4,14 +4,13 @@ from book import Book
 from user import User
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Required for session
+app.secret_key = "supersecretkey"
 
-# Initialize database collections
+# ---------- INITIALIZE ----------
 Book.initialize_collection()
 
 @app.context_processor
 def inject_user():
-    """Make the current user available in all templates."""
     return dict(current_user=session.get("user"))
 
 # ---------- HOME / BOOK TITLES ----------
@@ -19,11 +18,11 @@ def inject_user():
 def index():
     category = request.args.get('category', 'All')
     books = Book.get_books_by_category(category)
-    count = len(books)
+    total = len(books)
 
     client = MongoClient("mongodb://localhost:27017/")
     db = client["libraryDB"]
-    categories = sorted(db["books"].distinct("category"))  # ✅ lowercase
+    categories = sorted(db["books"].distinct("category"))
     client.close()
 
     return render_template(
@@ -31,7 +30,7 @@ def index():
         books=books,
         categories=categories,
         selected_category=category,
-        total=count
+        total=total
     )
 
 # ---------- REGISTER ----------
@@ -43,8 +42,7 @@ def register():
         name = request.form['name']
         if User.register(email, password, name):
             return redirect(url_for('login'))
-        else:
-            return render_template('register.html', error="Email already registered")
+        return render_template('register.html', error="Email already registered")
     return render_template('register.html')
 
 # ---------- LOGIN ----------
@@ -61,8 +59,7 @@ def login():
                 'is_admin': user.get('is_admin', False)
             }
             return redirect(url_for('index'))
-        else:
-            return render_template('login.html', error="Invalid email or password")
+        return render_template('login.html', error="Invalid email or password")
     return render_template('login.html')
 
 # ---------- LOGOUT ----------
@@ -76,11 +73,11 @@ def logout():
 def book_detail(title):
     client = MongoClient("mongodb://localhost:27017/")
     db = client["libraryDB"]
-    book = db["books"].find_one({"title": title}, {"_id": 0})  # ✅ lowercase
+    book = db["books"].find_one({"title": title}, {"_id": 0})
     client.close()
     return render_template('book_detail.html', book=book)
 
-# ---------- ADD NEW BOOK (ADMIN ONLY) ----------
+# ---------- ADD NEW BOOK (ADMIN) ----------
 @app.route('/new_book', methods=['GET', 'POST'])
 def new_book():
     if 'user' not in session or not session['user']['is_admin']:
@@ -113,23 +110,29 @@ def new_book():
 
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        db.books.insert_one({                      # ✅ lowercase collection
+        db.books.insert_one({
             'title': title,
             'category': category,
-            'url': cover_url,                      # ✅ consistent with index.html
-            'description': [description],          # ✅ stored as list
+            'url': cover_url,
+            'description': [description],
             'pages': int(pages),
             'copies': int(copies),
             'available': int(copies),
             'genres': genres,
-            'authors': [a['name'] for a in authors]  # ✅ same format as all_books
+            'authors': [a['name'] for a in authors]
         })
         client.close()
 
-        flash(f'"{title}" has been successfully added!', 'success')
+        flash(f'"{title}" added successfully!', 'success')
         return redirect(url_for('new_book'))
 
     return render_template('new_book.html', genres=genres_list)
+
+# ---------- MAKE A LOAN (placeholder for part c) ----------
+@app.route('/make_loan/<string:title>')
+def make_loan(title):
+    flash(f'Make a Loan feature for "{title}" will be implemented in part (c).', 'info')
+    return redirect(url_for('book_detail', title=title))
 
 if __name__ == '__main__':
     app.run(debug=True)
