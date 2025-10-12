@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
+
 <!-- BOOK TITLES HEADER -->
-<h3 class="text-white text-center py-2" style="background-color:#1b7a43;">BOOK TITLES</h3>
+<h3 class="text-white text-center py-2" style="background-color: #1b7a43;">BOOK TITLES</h3>
 
 <!-- SEARCH ROW -->
-<div class="d-flex flex-wrap justify-content-between align-items-center py-2 px-3" style="background-color:#cde5cf;">
+<div class="d-flex flex-wrap justify-content-between align-items-center py-2 px-3" style="background-color: #cde5cf;">
   <div class="mb-2 mb-md-0">
     <strong>Number of titles:</strong> {{ total }}
   </div>
+
   <form method="POST" class="d-flex flex-wrap align-items-center">
     <label for="category" class="me-2 fw-bold">Category:</label>
-    <select name="category" id="category" class="form-select me-2 mb-2 mb-sm-0" style="width:auto;">
+    <select name="category" id="category" class="form-select me-2 mb-2 mb-sm-0" style="width: auto;">
       <option value="All" {% if category == 'All' %}selected{% endif %}>All</option>
       <option value="Children" {% if category == 'Children' %}selected{% endif %}>Children</option>
       <option value="Teens" {% if category == 'Teens' %}selected{% endif %}>Teens</option>
@@ -35,17 +37,27 @@
         <div class="card-body">
           <h5 class="card-title text-success fw-bold">{{ b['title'] }}</h5>
           <p class="mb-1"><strong>Author(s):</strong> {{ b['authors'] | join(', ') }}</p>
-          <p class="mb-1"><strong>Category:</strong> {{ b['category'] }} &nbsp; | &nbsp; <strong>Pages:</strong> {{ b['pages'] }}</p>
-          <p class="mb-1"><strong>Copies:</strong> {{ b['copies'] }} &nbsp; | &nbsp; <strong>Available:</strong> {{ b['available'] }}</p>
+          <p class="mb-1">
+            <strong>Category:</strong> {{ b['category'] }}
+            &nbsp; | &nbsp;
+            <strong>Pages:</strong> {{ b['pages'] }}
+          </p>
+          <p class="mb-1">
+            <strong>Copies:</strong> {{ b['copies'] }}
+            &nbsp; | &nbsp;
+            <strong>Available:</strong> {{ b['available'] }}
+          </p>
 
           <p class="mt-2">{{ b['description'][0] }}</p>
-          {% if b['description']|length > 1 %}
+          {% if b['description'] | length > 1 %}
           <p>{{ b['description'][-1] }}</p>
           {% endif %}
 
           <!-- BUTTON BOTTOM RIGHT -->
           <div class="d-flex justify-content-end">
-            <a href="{{ url_for('book_detail', title=b['title']) }}" class="btn btn-success mt-2">More details</a>
+            <a href="{{ url_for('book_detail', title=b['title']) }}" class="btn btn-success mt-2">
+              More details
+            </a>
           </div>
         </div>
       </div>
@@ -53,8 +65,9 @@
   </div>
   {% endfor %}
 
-  {% if books|length == 0 %}
-    <p class="text-center text-danger mt-4">No books found for this category.</p>
+  {% if books | length == 0 %}
+  <p class="text-center text-danger mt-4">No books found for this category.</p>
   {% endif %}
 </div>
+
 {% endblock %}

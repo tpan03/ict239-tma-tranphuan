@@ -1,35 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<!-- BOOK DETAILS HEADER -->
+<h3 class="text-white text-center py-2" style="background-color: #1b7a43;">
+  BOOK DETAILS
+</h3>
+
+<!-- BOOK DETAILS CARD -->
 <div class="card mt-3 shadow-sm border-success">
   <div class="row g-0">
-    <!-- Book cover -->
-    <div class="col-md-4 d-flex align-items-center justify-content-center p-3">
-      <img src="{{ book['url'] }}" class="img-fluid rounded-start" alt="{{ book['title'] }}">
+    <!-- BOOK COVER -->
+    <div class="col-md-4 d-flex justify-content-center p-3">
+      <img src="{{ book['url'] }}" class="img-fluid rounded-start" alt="{{ book['title'] }}" style="max-height: 400px; object-fit: cover;">
     </div>
 
-    <!-- Book details -->
+    <!-- BOOK INFORMATION -->
     <div class="col-md-8">
       <div class="card-body">
         <h3 class="card-title text-success">{{ book['title'] }}</h3>
         <p class="fw-bold mb-1">Author(s): {{ book['authors'] | join(', ') }}</p>
         <p class="mb-1"><strong>Category:</strong> {{ book['category'] }}</p>
         <p class="mb-1"><strong>Pages:</strong> {{ book['pages'] }}</p>
-        <p class="mb-1"><strong>Copies:</strong> {{ book['copies'] }} | 
-          <strong>Available:</strong> {{ book['available'] }}</p>
+        <p class="mb-1">
+          <strong>Copies:</strong> {{ book['copies'] }}
+          &nbsp; | &nbsp;
+          <strong>Available:</strong> {{ book['available'] }}
+        </p>
 
         <hr>
 
-        <!-- Full Description -->
+        <!-- FULL DESCRIPTION -->
         <h5 class="text-success mt-3">Description</h5>
         {% for paragraph in book['description'] %}
-          <p>{{ paragraph }}</p>
+        <p>{{ paragraph }}</p>
         {% endfor %}
 
-        <!-- Back button -->
-        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Book Titles</a>
+        <!-- BACK BUTTON -->
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">
+          Back to Book Titles
+        </a>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
