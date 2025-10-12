@@ -38,15 +38,19 @@
   </div>
 
   <!-- ✅ BUTTON SECTION -->
-  <div class="d-flex justify-content-end gap-2 mt-3">
-    <!-- Back to Book Titles -->
-    <a href="{{ url_for('index') }}" class="btn btn-success">Back to Book Titles</a>
+  <div class="d-flex justify-content-end mt-3">
+    <!-- Always show "Back" button -->
+    <a href="{{ url_for('index') }}" class="btn btn-success me-2">Back to Book Titles</a>
 
-    <!-- Conditional Loan / Not Available -->
-    {% if book['available'] > 0 %}
-      <a href="{{ url_for('make_loan', title=book['title']) }}" class="btn btn-success">Make a Loan</a>
-    {% else %}
+    <!-- Case 1: No copies available -->
+    {% if book['available'] == 0 %}
       <button class="btn btn-danger" disabled>Not Available</button>
+
+    <!-- Case 2: Copies available -->
+    {% else %}
+      {% if not current_user or (current_user and not current_user.get('is_admin', False)) %}
+        <a href="{{ url_for('make_loan', title=book['title']) }}" class="btn btn-success">Make a Loan</a>
+      {% endif %}
     {% endif %}
   </div>
 </div>

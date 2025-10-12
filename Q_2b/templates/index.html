@@ -50,9 +50,11 @@
 
           <!-- BUTTONS -->
           <div class="d-flex justify-content-end gap-2">
+            <!-- Always show "More details" -->
             <a href="{{ url_for('book_detail', title=b['title']) }}" class="btn btn-success mt-2">More details</a>
-            {% if b['available'] > 0 %}
-              <!-- ✅ Changed from blue to green -->
+
+            <!-- Show "Make a Loan" only for logged-in non-admin users -->
+            {% if current_user and not current_user['is_admin'] and b['available'] > 0 %}
               <a href="{{ url_for('make_loan', title=b['title']) }}" class="btn btn-success mt-2">Make a Loan</a>
             {% endif %}
           </div>

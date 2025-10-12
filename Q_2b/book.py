@@ -37,7 +37,7 @@ class Book:
         """Populate MongoDB 'Book' collection from all_books if empty."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
 
         if book_col.count_documents({}) == 0:
             print("Book collection empty — populating from all_books...")
@@ -65,7 +65,7 @@ class Book:
         """Retrieve all book documents from MongoDB."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        books = list(db["Book"].find({}, {"_id": 0}))
+        books = list(db["books"].find({}, {"_id": 0}))
         client.close()
         return books
 
@@ -74,7 +74,7 @@ class Book:
         """Retrieve books filtered by category."""
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
         if category == "All":
             results = list(book_col.find({}, {"_id": 0}))
         else:
@@ -91,7 +91,7 @@ class Book:
         """
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
 
         book = book_col.find_one({"title": title})
         if not book:
@@ -119,7 +119,7 @@ class Book:
         """
         client = MongoClient("mongodb://localhost:27017/")
         db = client["libraryDB"]
-        book_col = db["Book"]
+        book_col = db["books"]
 
         book = book_col.find_one({"title": title})
         if not book:
